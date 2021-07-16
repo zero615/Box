@@ -48,7 +48,7 @@ public class BoxManager {
         String runtimeClass = packageInfo.packageName + NAME_RUNTIME;
         try {
             Class<?> cls = classLoader.findClass(runtimeClass);
-            BoxRuntime runtime = new BoxRuntime(cls, packageInfo);
+            BoxRuntime runtime = new BoxRuntime(cls);
             runtime.init(context, context.getClassLoader(), packageInfo, Collections.emptyMap());
             Box box = new Box(packageInfo, classLoader, runtime);
             boxes.put(packageInfo.packageName, box);

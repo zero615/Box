@@ -19,8 +19,6 @@ public class BoxRuntime {
     private static AssetManager assetManager;
     private static Context context;
     private static IBoxPlugin plugin;
-    private static String asInterface = "@asInterface";
-    private static String asBinder = "@asBinder";
 
     @Keep
     public static void init(Context callerContext, ClassLoader caller, PackageInfo packageInfo, Map<String, Object> extra) {

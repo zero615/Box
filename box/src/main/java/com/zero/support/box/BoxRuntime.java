@@ -13,7 +13,7 @@ public class BoxRuntime {
     private Method getExtra;
     private Method init;
 
-    public BoxRuntime(Class<?> box, PackageInfo packageInfo) {
+    public BoxRuntime(Class<?> box) {
         try {
             getPackageInfo = box.getDeclaredMethod("getPackageInfo");
             getCallerContext = box.getDeclaredMethod("getCallerContext");
