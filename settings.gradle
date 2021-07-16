@@ -1,0 +1,5 @@
+include ':plugin'
+include ':compiler'
+include ':box'
+include ':app'
+rootProject.name = "Box"
