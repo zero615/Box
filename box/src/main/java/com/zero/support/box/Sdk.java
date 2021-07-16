@@ -45,10 +45,10 @@ public class Sdk {
         return SdkManager.getInstance().getLauncher(name).getCurrentPath() != null;
     }
 
-    public static void load(String name, ClassLoader parent) {
+    public static ClassLoader load(String name, ClassLoader parent) {
         Launcher launcher = SdkManager.getInstance().getLauncher(name);
         String path = launcher.getCurrentPath();
-        BoxManager.load(app, parent, new File(path, "base.apk").getPath(), new File(path, getAbiName()).getPath());
+       return BoxManager.load(app, parent, new File(path, "base.apk").getPath(), new File(path, getAbiName()).getPath());
     }
 
     public static String getAbiName() {
