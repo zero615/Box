@@ -30,7 +30,7 @@ public class AppAssetsLaunchCallback implements LauncherCallback {
         File next = launcher.getAvailableNext();
         File target = new File(next, "base.apk");
         try {
-            FileUtils.extractAsset(context, new File(assetsDir).getCanonicalPath() + File.separator + launcher.getName() + "." + extensionName, target);
+            FileUtils.extractAsset(context, assetsDir + launcher.getName() + "." + extensionName, target);
             FileUtils.extractFile(target, "lib", new File(target.getParentFile(), "lib"));
             launcher.switchToNext(next.getCanonicalPath(), 0);
         } catch (IOException e) {
