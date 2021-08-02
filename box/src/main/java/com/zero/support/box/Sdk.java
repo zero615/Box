@@ -32,6 +32,10 @@ public class Sdk {
         }
     }
 
+    public static File getRoot() {
+        return LauncherManager.getDefault().getRoot();
+    }
+
     public static String currentProcessName() {
         return processName;
     }
@@ -63,13 +67,23 @@ public class Sdk {
         return LauncherManager.getDefault().getLauncher(name).getCurrentPath() != null;
     }
 
-    public static ClassLoader load(String name, ClassLoader parent) {
+    public static Box load(String name, ClassLoader parent) {
         Launcher launcher = LauncherManager.getDefault().getLauncher(name);
         String path = launcher.getCurrentPath();
         if (path == null) {
             return null;
         }
-        return BoxManager.load(app, parent, new File(path, "base.apk").getPath(), new File(path, getAbiName()).getPath());
+        return BoxManager.load(app, parent, new File(path, "base.apk"), new File(path, getAbiName()));
+    }
+
+
+    public static Box loadToParent(String name, ClassLoader parent) {
+        Launcher launcher = LauncherManager.getDefault().getLauncher(name);
+        String path = launcher.getCurrentPath();
+        if (path == null) {
+            return null;
+        }
+        return BoxManager.loadToParent(app, new File(path, "base.apk"), new File(path, getAbiName()), parent);
     }
 
     public static String getAbiName() {

@@ -2,7 +2,10 @@ package com.zero.support.box.util;
 
 import android.content.Context;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,8 +23,35 @@ public class FileUtils {
         }
     }
 
+    public static void copy(File src, File target) {
+        FileInputStream is = null;
+        FileOutputStream os = null;
+        try {
+            is = new FileInputStream(src);
+            os = new FileOutputStream(target);
+            copy(is, os);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            closeQuietly(is);
+            closeQuietly(os);
+        }
+
+    }
+
+    public static void closeQuietly(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (IOException e) {
+                //ignore
+            }
+        }
+    }
+
     public static void extractAsset(Context context, String name, File target) throws IOException {
         InputStream stream = context.getAssets().open(name);
+        target.getParentFile().mkdirs();
         OutputStream outputStream = new FileOutputStream(target);
         FileUtils.copy(stream, outputStream);
         stream.close();
