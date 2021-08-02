@@ -1,10 +1,13 @@
 package com.zero.support.box;
 
+import android.app.ActivityThread;
 import android.app.Application;
+import android.os.Build;
 import android.os.Process;
 
 import com.zero.support.box.manager.Launcher;
-import com.zero.support.box.manager.SdkManager;
+import com.zero.support.box.manager.LauncherCallback;
+import com.zero.support.box.manager.LauncherManager;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -13,16 +16,31 @@ import static android.os.Build.VERSION.SDK_INT;
 
 public class Sdk {
     private static Application app;
+    private static String processName;
 
-    public static void initialize(SdkConfig config) {
-        Sdk.app = config.getApplication();
-        SdkManager.initialize(config);
+    public static void initialize(Application app, File root, LauncherCallback callback) {
+        Sdk.app = app;
+        Sdk.processName = getCurrentProcessName();
+        LauncherManager.initialize(app, root, callback);
+    }
+
+    private static String getCurrentProcessName() {
+        if (SDK_INT >= Build.VERSION_CODES.P) {
+            return Application.getProcessName();
+        } else {
+            return ActivityThread.currentProcessName();
+        }
+    }
+
+    public static String currentProcessName() {
+        return processName;
     }
 
     public static Application getApplication() {
         return app;
     }
 
+    @SuppressWarnings("all")
     public static boolean is64bit() {
         if (SDK_INT < 21) {
             return false;
@@ -41,14 +59,17 @@ public class Sdk {
         }
     }
 
-    public static boolean install(String name) {
-        return SdkManager.getInstance().getLauncher(name).getCurrentPath() != null;
+    public static boolean isInstall(String name) {
+        return LauncherManager.getDefault().getLauncher(name).getCurrentPath() != null;
     }
 
     public static ClassLoader load(String name, ClassLoader parent) {
-        Launcher launcher = SdkManager.getInstance().getLauncher(name);
+        Launcher launcher = LauncherManager.getDefault().getLauncher(name);
         String path = launcher.getCurrentPath();
-       return BoxManager.load(app, parent, new File(path, "base.apk").getPath(), new File(path, getAbiName()).getPath());
+        if (path == null) {
+            return null;
+        }
+        return BoxManager.load(app, parent, new File(path, "base.apk").getPath(), new File(path, getAbiName()).getPath());
     }
 
     public static String getAbiName() {
