@@ -11,6 +11,7 @@ buildscript {
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
 //        classpath files("compiler/build/libs/compiler.jar")
+        classpath 'com.github.zero615.Box:compiler:1.0.0'
     }
 }
 

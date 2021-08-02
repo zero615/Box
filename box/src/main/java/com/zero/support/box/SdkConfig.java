@@ -3,6 +3,8 @@ package com.zero.support.box;
 import android.app.Application;
 import android.content.pm.PackageInfo;
 
+import com.zero.support.box.manager.LauncherCallback;
+
 import java.io.File;
 
 public abstract class SdkConfig {
@@ -18,5 +20,5 @@ public abstract class SdkConfig {
 
     public abstract PackageInfo getHostPackageInfo();
 
-    public abstract SdkInstaller getSdkInstaller();
+    public abstract LauncherCallback getLaunchCallback();
 }

@@ -11,34 +11,32 @@ import com.zero.support.box.util.Preferences;
 import java.io.File;
 
 /**
- * 基于安装时间的目录管理器，只维护两个目录
+ * 基于token的目录管理器，只维护两个目录
  */
 public class Launcher {
-    private Preferences preferences;
-    private boolean needInstall;
-    private boolean firstInstall;
-    private String name;
-    private long realInstallTime;
-    private File root;
+    private static final String KEY_TOKEN = "token";
+    private static final String KEY_NEXT_TOKEN = "token";
+    private static final String KEY_INSTALL_TOKEN = "install_token";
+    private static final String KEY_CURRENT = "current";
+    private static final String KEY_PREVIOUS = "previous";
+    private static final String KEY_NEXT = "next";
+    private final Preferences preferences;
+    private final String name;
+    private final File root;
 
 
-    public Launcher(SdkManager manager, File root, String name) {
-        this(manager, new File(root, name + ".json"), root, name);
+    public Launcher(File root, String name) {
+        this(new File(root, name + ".json"), root, name);
     }
 
-    public Launcher(SdkManager manager, File launcher, File root, String name) {
+    public String getName() {
+        return name;
+    }
+
+    public Launcher(File launcher, File root, String name) {
         this.name = name;
         this.root = root;
         preferences = new Preferences(launcher, false);
-        long installTime = preferences.getLong("installTime", 0);
-        long firstInstallTime = preferences.getLong("firstInstallTime", 0);
-        realInstallTime = manager.getInstallTime();
-        needInstall = realInstallTime != installTime;
-        firstInstall = firstInstallTime == 0;
-    }
-
-    public boolean isInstall() {
-        return getCurrentPath() != null;
     }
 
     public File getAvailableNext() {
@@ -59,41 +57,52 @@ public class Launcher {
 
 
     public String getNextPath() {
-        return preferences.getString("next", null);
+        return preferences.getString(KEY_NEXT, null);
     }
 
-    public void setNext(String next) {
-        preferences.putString("next", next);
+    @SuppressLint("ApplySharedPref")
+    public void installNext(String next, long token) {
+        preferences.edit().putString(KEY_NEXT, next).putLong(KEY_NEXT_TOKEN, token).commit();
     }
 
 
     public String getCurrentPath() {
-        return preferences.getString("current", null);
+        return preferences.getString(KEY_CURRENT, null);
     }
 
 
     public String getPreviousPath() {
-        return preferences.getString("previous", null);
+        return preferences.getString(KEY_PREVIOUS, null);
     }
 
     public boolean isNeedInstall() {
-        return needInstall;
+        return getCurrentPath() == null;
+    }
+
+    public boolean enableNext() {
+        long token = preferences.getLong(KEY_NEXT_TOKEN, 0L);
+        if (token != 0) {
+            return switchToNext(getNextPath(), token);
+        }
+        return false;
     }
 
     @SuppressLint("ApplySharedPref")
-    public void switchToNext(String next) {
+    public boolean switchToNext(String next, long token) {
         SharedPreferences.Editor editor = preferences.edit();
-        if (firstInstall) {
-            editor.putLong("firstInstallTime", realInstallTime);
+        if (getInstallToken() == 0) {
+            editor.putLong(KEY_INSTALL_TOKEN, token);
         }
-        if (needInstall) {
-            editor.putLong("installTime", realInstallTime);
+        editor.putLong(KEY_TOKEN, token);
+        boolean result = editor.putString(KEY_PREVIOUS, getCurrentPath())
+                .putString(KEY_CURRENT, next)
+                .putString(KEY_NEXT, null)
+                .putLong(KEY_NEXT_TOKEN, 0).commit();
+        if (result) {
+            removePrevious();
         }
-        editor.putString("previous", getCurrentPath())
-                .putString("current", next)
-                .putString("next", null).commit();
+        return true;
     }
-
 
     public void removePrevious() {
         String previous = getPreviousPath();
@@ -105,12 +114,24 @@ public class Launcher {
                 }
             }
         }
-        preferences.putString("previous", null);
+        preferences.putString(KEY_PREVIOUS, null);
+    }
+
+    public boolean isInstall() {
+        return getCurrentPath() == null;
     }
 
     public boolean isFirstInstall() {
-        return firstInstall;
+        return getInstallToken() == getToken();
     }
 
+    public long getInstallToken() {
+
+        return preferences.getLong("install_token", 0);
+    }
+
+    public long getToken() {
+        return preferences.getLong("token", 0);
+    }
 
 }

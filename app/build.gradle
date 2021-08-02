@@ -3,7 +3,7 @@ plugins {
     id 'com.android.application'
 }
 //
-//apply plugin: 'AppBox'
+apply plugin: 'AppBox'
 
 android {
     compileSdkVersion 30

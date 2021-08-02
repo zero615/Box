@@ -29,15 +29,6 @@ public class ContextClassLoader extends ClassLoader {
         return INSTANCE;
     }
 
-    public void load(BoxClassLoader loader) {
-        loaders.add(loader);
-    }
-
-    @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
-        return super.findClass(name);
-    }
-
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         for (BoxClassLoader loader : loaders) {
