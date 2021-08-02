@@ -1,5 +1,5 @@
-# binder
-no aidl
+# box
+package manger
 
 ## 关于集成：
 - **在项目的根目录的`build.gradle`添加：**
@@ -14,7 +14,7 @@ allprojects {
 - **在应用模块的`build.gradle`添加：**
 ```
 dependencies {
-        implementation 'com.github.zero615.Box:box:1.0.0'
+        implementation 'com.github.zero615.Box:box:1.0.1'
 }
 ```
 ## 使用示例：
@@ -32,7 +32,7 @@ dependencies {
 ```
  dependencies {
     ...
-    classpath 'com.github.zero615.Box:compiler:1.0.0'
+    classpath 'com.github.zero615.Box:compiler:1.0.1'
  }
 ```
  
