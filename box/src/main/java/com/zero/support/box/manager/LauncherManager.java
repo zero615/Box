@@ -23,6 +23,10 @@ public class LauncherManager {
         this.root = root;
     }
 
+    public File getRoot() {
+        return root;
+    }
+
     public static void initialize(Application app, File root, LauncherCallback callback) {
         instance = new LauncherManager(app, root, callback);
     }
