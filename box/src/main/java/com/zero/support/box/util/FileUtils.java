@@ -5,7 +5,6 @@ import android.content.Context;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,11 +22,12 @@ public class FileUtils {
         }
     }
 
-    public static void copy(File src, File target) {
+    public static void copyFile(File src, File target) {
         FileInputStream is = null;
         FileOutputStream os = null;
         try {
             is = new FileInputStream(src);
+            target.getParentFile().mkdirs();
             os = new FileOutputStream(target);
             copy(is, os);
         } catch (IOException e) {

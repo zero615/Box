@@ -34,17 +34,16 @@ public class BoxManager {
         }
     }
 
-    public static ClassLoader loadToParent(Context context, File path, File lib, ClassLoader loader) {
-        ClassLoader target = load(context, loader.getParent(), path, lib);
+
+    public static void becomToParent(ClassLoader target, ClassLoader loader) {
         try {
-            if (target == null) {
-                return null;
+            if (target == null || loader == null) {
+                return;
             }
-            parentField.set(loader, target);
+            parentField.set(target, loader);
         } catch (Throwable e) {
             e.printStackTrace();
         }
-        return target;
     }
 
     public static ClassLoader load(Context context, File path, File lib) {

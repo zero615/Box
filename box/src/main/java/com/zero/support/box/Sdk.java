@@ -65,30 +65,27 @@ public class Sdk {
     }
 
     public static boolean install(String name) {
-        return LauncherManager.getDefault().getLauncher(name).getCurrentPath() != null;
+        return LauncherManager.getDefault().install(name);
     }
 
-    public boolean install(File root, String name) {
-        return LauncherManager.getDefault().getLauncher(root, name).getCurrentPath() != null;
+    public static boolean install(File root, String name) {
+        return LauncherManager.getDefault().install(root, name);
     }
 
-    public static ClassLoader load(String name, ClassLoader parent, boolean debug) {
+    public static ClassLoader load(String name, ClassLoader parent) {
+        install(name);
         Launcher launcher = LauncherManager.getDefault().getLauncher(name);
-        String path = launcher.getCurrentPath();
-        if (path == null) {
-            return null;
-        }
-        return BoxManager.load(app, parent, new File(path, "base.apk"), new File(path, getAbiName()));
+        return LauncherManager.getDefault().getLauncherCallback().onLoadLauncher(app, launcher, parent);
     }
 
-
-    public static ClassLoader loadToParent(String name, ClassLoader parent) {
+    public static ClassLoader load(File root, String name, ClassLoader parent) {
+        install(root, name);
         Launcher launcher = LauncherManager.getDefault().getLauncher(name);
-        String path = launcher.getCurrentPath();
-        if (path == null) {
-            return null;
-        }
-        return BoxManager.loadToParent(app, new File(path, "base.apk"), new File(path, getAbiName()), parent);
+        return LauncherManager.getDefault().getLauncherCallback().onLoadLauncher(app, launcher, parent);
+    }
+    
+    public static void becomToParent(ClassLoader target, ClassLoader loader) {
+        BoxManager.becomToParent(target, loader);
     }
 
     public static String getAbiName() {
