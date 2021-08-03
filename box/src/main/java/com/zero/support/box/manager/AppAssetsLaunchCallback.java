@@ -31,7 +31,8 @@ public class AppAssetsLaunchCallback implements LauncherCallback {
     public ClassLoader onLoadLauncher(Context context, Launcher launcher, ClassLoader parent) {
         String next = launcher.getCurrentPath();
         File target = new File(next, "base.apk");
-        File lib = new File(new File(next, "lib"), Sdk.getAbiName());
+        File libRoot =new File(next, "lib");
+        File lib = new File(libRoot, Sdk.getAbiName(libRoot));
         return BoxManager.load(context, parent, target, lib);
     }
 

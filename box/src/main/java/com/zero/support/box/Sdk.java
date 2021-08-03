@@ -45,7 +45,7 @@ public class Sdk {
         return app;
     }
 
-    @SuppressWarnings("all")
+
     public static boolean is64bit() {
         if (SDK_INT < 21) {
             return false;
@@ -80,7 +80,7 @@ public class Sdk {
 
     public static ClassLoader load(File root, String name, ClassLoader parent) {
         install(root, name);
-        Launcher launcher = LauncherManager.getDefault().getLauncher(root,name);
+        Launcher launcher = LauncherManager.getDefault().getLauncher(root, name);
         return LauncherManager.getDefault().getLauncherCallback().onLoadLauncher(app, launcher, parent);
     }
 
@@ -88,7 +88,37 @@ public class Sdk {
         BoxManager.becomToParent(target, loader);
     }
 
+    public static String getAbiName(File libRoot) {
+        String abis[];
+        if (SDK_INT < 21) {
+            return Build.CPU_ABI;
+        }
+        if (is64bit()) {
+            for (String abi : Build.SUPPORTED_64_BIT_ABIS) {
+                if (new File(libRoot, abi).exists()) {
+                    return abi;
+                }
+            }
+            return Build.SUPPORTED_64_BIT_ABIS[0];
+        } else {
+            for (String abi : Build.SUPPORTED_32_BIT_ABIS) {
+                if (new File(libRoot, abi).exists()) {
+                    return abi;
+                }
+            }
+            return Build.SUPPORTED_32_BIT_ABIS[0];
+        }
+    }
+
     public static String getAbiName() {
-        return new File(app.getApplicationInfo().nativeLibraryDir).getName();
+        String abis[];
+        if (SDK_INT < 21) {
+            return Build.CPU_ABI;
+        }
+        if (is64bit()) {
+            return Build.SUPPORTED_64_BIT_ABIS[0];
+        } else {
+            return Build.SUPPORTED_32_BIT_ABIS[0];
+        }
     }
 }
