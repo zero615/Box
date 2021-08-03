@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 
 import static android.os.Build.VERSION.SDK_INT;
 
+@SuppressWarnings("all")
 public class Sdk {
     private static Application app;
     private static String processName;
@@ -63,11 +64,15 @@ public class Sdk {
         }
     }
 
-    public static boolean isInstall(String name) {
+    public static boolean install(String name) {
         return LauncherManager.getDefault().getLauncher(name).getCurrentPath() != null;
     }
 
-    public static Box load(String name, ClassLoader parent) {
+    public boolean install(File root, String name) {
+        return LauncherManager.getDefault().getLauncher(root, name).getCurrentPath() != null;
+    }
+
+    public static ClassLoader load(String name, ClassLoader parent, boolean debug) {
         Launcher launcher = LauncherManager.getDefault().getLauncher(name);
         String path = launcher.getCurrentPath();
         if (path == null) {
@@ -77,7 +82,7 @@ public class Sdk {
     }
 
 
-    public static Box loadToParent(String name, ClassLoader parent) {
+    public static ClassLoader loadToParent(String name, ClassLoader parent) {
         Launcher launcher = LauncherManager.getDefault().getLauncher(name);
         String path = launcher.getCurrentPath();
         if (path == null) {
