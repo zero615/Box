@@ -80,10 +80,10 @@ public class Sdk {
 
     public static ClassLoader load(File root, String name, ClassLoader parent) {
         install(root, name);
-        Launcher launcher = LauncherManager.getDefault().getLauncher(name);
+        Launcher launcher = LauncherManager.getDefault().getLauncher(root,name);
         return LauncherManager.getDefault().getLauncherCallback().onLoadLauncher(app, launcher, parent);
     }
-    
+
     public static void becomToParent(ClassLoader target, ClassLoader loader) {
         BoxManager.becomToParent(target, loader);
     }
