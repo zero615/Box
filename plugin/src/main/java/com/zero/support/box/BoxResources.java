@@ -1,4 +1,4 @@
-package com.zero.support.box.plugin;
+package com.zero.support.box;
 import android.content.res.AssetManager;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -9,8 +9,8 @@ import android.util.TypedValue;
 import androidx.annotation.RequiresApi;
 
 public class BoxResources extends Resources {
-    private String mPackageName;
-    private Resources mResource;
+    private final String mPackageName;
+    private final Resources mResource;
     public BoxResources(String packageName, AssetManager manager, Resources resource) {
         super(manager, resource.getDisplayMetrics(), resource.getConfiguration());
         mPackageName = packageName;

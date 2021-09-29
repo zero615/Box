@@ -1,4 +1,4 @@
-package com.zero.support.box.plugin;
+package com.zero.support.box;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;

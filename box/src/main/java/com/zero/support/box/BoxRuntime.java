@@ -2,30 +2,27 @@ package com.zero.support.box;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
+import android.content.res.AssetManager;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 
 public class BoxRuntime {
-    private Method getPackageInfo;
-    private Method getCallerContext;
-    private Method getCaller;
-    private Method getExtra;
+    private Method getAssetManager;
     private Method init;
+    private Method getContext;
 
     public BoxRuntime(Class<?> box) {
         try {
-            getPackageInfo = box.getDeclaredMethod("getPackageInfo");
-            getCallerContext = box.getDeclaredMethod("getCallerContext");
-            getCaller = box.getDeclaredMethod("getCaller");
-            getExtra = box.getDeclaredMethod("getExtra", String.class);
             init = box.getDeclaredMethod("init", Context.class, ClassLoader.class, PackageInfo.class, Map.class);
+            getAssetManager = box.getDeclaredMethod("getAssetManager");
+            getContext = box.getDeclaredMethod("getContext");
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    final void init(android.content.Context context, ClassLoader caller, PackageInfo info, Map extras) {
+    final void init(android.content.Context context, ClassLoader caller, PackageInfo info, Map<String, Object> extras) {
         try {
             init.invoke(null, context, caller, info, extras);
         } catch (Throwable e) {
@@ -33,35 +30,21 @@ public class BoxRuntime {
         }
     }
 
-    public final String getPackageInfo() {
+
+    public final AssetManager getAssetManager() {
         try {
-            return (String) getPackageInfo.invoke(null);
+            return (AssetManager) getAssetManager.invoke(null);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
-    public final android.content.Context getCallerContext() {
+    public final Context getContext() {
         try {
-            return (Context) getCallerContext.invoke(null);
+            return (Context) getContext.invoke(null);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
-    public final ClassLoader getCaller() {
-        try {
-            return (ClassLoader) getCaller.invoke(null);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public final Object getExtra(String key) {
-        try {
-            return getExtra.invoke(null, key);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

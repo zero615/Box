@@ -329,11 +329,17 @@ public class BoxConstant {
             "        BoxRuntime.callerContext = callerContext;\n" +
             "        BoxRuntime.packageInfo = packageInfo;\n" +
             "        BoxRuntime.extras = extra;\n" +
-            "        context = BoxContext.newBoxContext(callerContext, packageInfo.applicationInfo.theme);\n" +
-            "        tryInitBoxPlugin();\n" +
+            "        if (caller != BoxRuntime.class.getClassLoader()) {\n" +
+            "            context = BoxContext.newBoxContext(callerContext, packageInfo.applicationInfo.theme);\n" +
+            "            tryInitBoxPlugin();\n" +
+            "            ensureInit();\n" +
+            "        } else {\n" +
+            "            context = callerContext;\n" +
+            "        }\n" +
             "    }\n" +
             "\n" +
             "    private static void tryInitBoxPlugin() {\n" +
+            "        context = BoxContext.newBoxContext(callerContext, packageInfo.applicationInfo.theme);\n" +
             "        String name = packageInfo.applicationInfo.name;\n" +
             "        try {\n" +
             "            Class<?> cls = Class.forName(name);\n" +
@@ -375,6 +381,10 @@ public class BoxConstant {
             "        return assetManager;\n" +
             "    }\n" +
             "\n" +
+            "    public static boolean isPlugin() {\n" +
+            "        return caller != BoxRuntime.class.getClassLoader();\n" +
+            "    }\n" +
+            "\n" +
             "    private static void ensureInit() {\n" +
             "        if (assetManager != null) {\n" +
             "            return;\n" +
@@ -394,5 +404,6 @@ public class BoxConstant {
             "    public static String getPackageName() {\n" +
             "        return packageInfo.packageName;\n" +
             "    }\n" +
+            "\n" +
             "}\n";
 }

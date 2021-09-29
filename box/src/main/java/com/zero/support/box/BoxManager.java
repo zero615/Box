@@ -64,13 +64,13 @@ public class BoxManager {
                 BoxRuntime runtime = new BoxRuntime(cls);
                 runtime.init(context, context.getClassLoader(), packageInfo, box.getExtras());
                 box.attachBoxRuntime(runtime);
-                synchronized (boxes) {
-                    boxes.put(packageInfo.packageName, box);
-                }
-                return box;
             } catch (Exception e) {
+                e.printStackTrace();
                 Log.e("box", "load: " + e.getMessage());
                 //ignore
+            }
+            synchronized (boxes) {
+                boxes.put(packageInfo.packageName, box);
             }
             return box;
         } catch (Throwable e) {
