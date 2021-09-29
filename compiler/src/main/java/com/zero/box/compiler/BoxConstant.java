@@ -3,14 +3,14 @@ package com.zero.box.compiler;
 public class BoxConstant {
     public static final String HOLDER = "com.zero.support.box";
 
-    public static final String BOX_PLUGIN = "package com.zero.support.box.plugin;\n" +
+    public static final String BOX_PLUGIN = "package com.zero.support.box;\n" +
             "\n" +
             "import android.content.Context;\n" +
             "\n" +
             "public interface IBoxPlugin {\n" +
             "    void onPluginLoaded(Context context);\n" +
             "}\n";
-    public static final String BOX_RESOURCE = "package com.zero.support.box.plugin;\n" +
+    public static final String BOX_RESOURCE = "package com.zero.support.box;\n" +
             "import android.content.res.AssetManager;\n" +
             "import android.content.res.ColorStateList;\n" +
             "import android.content.res.Resources;\n" +
@@ -189,7 +189,7 @@ public class BoxConstant {
             "    }\n" +
             "}";
 
-    public static final String BOX_CONTEXT = "package com.zero.support.box.plugin;\n" +
+    public static final String BOX_CONTEXT = "package com.zero.support.box;\n" +
             "\n" +
             "import android.app.Activity;\n" +
             "import android.content.Context;\n" +
@@ -301,7 +301,7 @@ public class BoxConstant {
             "    }\n" +
             "}";
 
-    public static final String BOX_RUNTIME = "package com.zero.support.box.plugin;\n" +
+    public static final String BOX_RUNTIME = "package com.zero.support.box;\n" +
             "\n" +
             "import android.content.Context;\n" +
             "import android.content.pm.PackageInfo;\n" +
