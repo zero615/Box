@@ -24,7 +24,7 @@ public class RuntimeGenerator {
 
     }
     private void generate(String name,String content,String pkg, File dir){
-        File target = new File(dir,pkg.replace(".","/")+"/plugin/"+name+".java");
+        File target = new File(dir,pkg.replace(".","/")+"/"+name+".java");
         try {
             FileUtils.writeStringToFile(target,content.replace(BoxConstant.HOLDER,pkg));
         } catch (IOException e) {
@@ -92,7 +92,7 @@ public class RuntimeGenerator {
                 .addMethod(getExtra)
                 .build();
 
-        JavaFile javaFile = JavaFile.builder(pkg+".plugin", typeSpec)
+        JavaFile javaFile = JavaFile.builder(pkg, typeSpec)
                 .addFileComment("auto generateProxyClass code,can not modify")
                 .build();
 
