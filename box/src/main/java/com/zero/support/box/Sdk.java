@@ -72,13 +72,13 @@ public class Sdk {
         return LauncherManager.getDefault().install(root, name);
     }
 
-    public static ClassLoader load(String name, ClassLoader parent) {
+    public static Box load(String name, ClassLoader parent) {
         install(name);
         Launcher launcher = LauncherManager.getDefault().getLauncher(name);
         return LauncherManager.getDefault().getLauncherCallback().onLoadLauncher(app, launcher, parent);
     }
 
-    public static ClassLoader load(File root, String name, ClassLoader parent) {
+    public static Box load(File root, String name, ClassLoader parent) {
         install(root, name);
         Launcher launcher = LauncherManager.getDefault().getLauncher(root, name);
         return LauncherManager.getDefault().getLauncherCallback().onLoadLauncher(app, launcher, parent);

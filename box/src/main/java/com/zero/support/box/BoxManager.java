@@ -7,7 +7,6 @@ import android.util.Log;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,31 +45,34 @@ public class BoxManager {
         }
     }
 
-    public static ClassLoader load(Context context, File path, File lib) {
+    public static Box load(Context context, File path, File lib) {
         return load(context, context.getClassLoader(), path, lib);
     }
 
-    public static ClassLoader load(Context context, ClassLoader parent, File apk, File lib) {
+    public static Box load(Context context, ClassLoader parent, File apk, File lib) {
         try {
             String path = apk.getCanonicalPath();
             PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(path, PackageManager.GET_META_DATA | PackageManager.GET_ACTIVITIES);
             packageInfo.applicationInfo.sourceDir = path;
             packageInfo.applicationInfo.publicSourceDir = path;
+            packageInfo.applicationInfo.nativeLibraryDir = lib.getCanonicalPath();
             DexClassLoader classLoader = new DexClassLoader(path, apk.getParentFile().getCanonicalPath(), lib.getCanonicalPath(), parent);
+            Box box = new Box(packageInfo, classLoader);
             try {
                 String runtimeClass = packageInfo.packageName + NAME_RUNTIME;
                 Class<?> cls = classLoader.loadClass(runtimeClass);
                 BoxRuntime runtime = new BoxRuntime(cls);
-                runtime.init(context, context.getClassLoader(), packageInfo, Collections.emptyMap());
-                Box box = new Box(packageInfo, classLoader, runtime);
+                runtime.init(context, context.getClassLoader(), packageInfo, box.getExtras());
+                box.attachBoxRuntime(runtime);
                 synchronized (boxes) {
                     boxes.put(packageInfo.packageName, box);
                 }
+                return box;
             } catch (Exception e) {
                 Log.e("box", "load: " + e.getMessage());
                 //ignore
             }
-            return classLoader;
+            return box;
         } catch (Throwable e) {
             e.printStackTrace();
         }

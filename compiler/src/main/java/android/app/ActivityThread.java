@@ -21,8 +21,4 @@ public final class ActivityThread {
     public static String currentProcessName() {
         throw new RuntimeException("Stub");
     }
-
-    public static Application currentApplication() {
-        throw new RuntimeException("Stub");
-    }
 }

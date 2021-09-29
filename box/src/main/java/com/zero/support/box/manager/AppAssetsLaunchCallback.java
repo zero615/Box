@@ -2,6 +2,7 @@ package com.zero.support.box.manager;
 
 import android.content.Context;
 
+import com.zero.support.box.Box;
 import com.zero.support.box.BoxManager;
 import com.zero.support.box.Sdk;
 import com.zero.support.box.util.FileUtils;
@@ -28,10 +29,10 @@ public class AppAssetsLaunchCallback implements LauncherCallback {
     }
 
     @Override
-    public ClassLoader onLoadLauncher(Context context, Launcher launcher, ClassLoader parent) {
+    public Box onLoadLauncher(Context context, Launcher launcher, ClassLoader parent) {
         String next = launcher.getCurrentPath();
         File target = new File(next, "base.apk");
-        File libRoot =new File(next, "lib");
+        File libRoot = new File(next, "lib");
         File lib = new File(libRoot, Sdk.getAbiName(libRoot));
         return BoxManager.load(context, parent, target, lib);
     }
