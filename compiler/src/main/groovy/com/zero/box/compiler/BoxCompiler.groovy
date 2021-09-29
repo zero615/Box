@@ -1,8 +1,6 @@
 package com.zero.box.compiler
 
 
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.AppPlugin
 import com.google.auto.service.AutoService
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -16,10 +14,6 @@ class BoxCompiler implements Plugin<Project> {
 
     @Override
     void apply(@Nonnull Project project) {
-
-        def android = project.getExtensions().getByType(AppExtension)
-
-        println(android.applicationVariants)
         project.extensions.create("BoxConfig",BoxConfig)
         project.tasks.whenTaskAdded {
             task ->
