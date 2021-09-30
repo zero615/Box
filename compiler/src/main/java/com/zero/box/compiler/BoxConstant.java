@@ -330,9 +330,9 @@ public class BoxConstant {
             "        BoxRuntime.packageInfo = packageInfo;\n" +
             "        BoxRuntime.extras = extra;\n" +
             "        if (caller != BoxRuntime.class.getClassLoader()) {\n" +
+            "            ensureInit();\n" +
             "            context = BoxContext.newBoxContext(callerContext, packageInfo.applicationInfo.theme);\n" +
             "            tryInitBoxPlugin();\n" +
-            "            ensureInit();\n" +
             "        } else {\n" +
             "            context = callerContext;\n" +
             "        }\n" +
@@ -373,10 +373,12 @@ public class BoxConstant {
             "        return extras.get(key);\n" +
             "    }\n" +
             "\n" +
+            "    @Keep\n" +
             "    public static Context getContext() {\n" +
             "        return context;\n" +
             "    }\n" +
             "\n" +
+            "    @Keep\n" +
             "    public static AssetManager getAssetManager() {\n" +
             "        return assetManager;\n" +
             "    }\n" +

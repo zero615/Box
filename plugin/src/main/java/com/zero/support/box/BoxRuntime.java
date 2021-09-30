@@ -27,9 +27,9 @@ public class BoxRuntime {
         BoxRuntime.packageInfo = packageInfo;
         BoxRuntime.extras = extra;
         if (caller != BoxRuntime.class.getClassLoader()) {
+            ensureInit();
             context = BoxContext.newBoxContext(callerContext, packageInfo.applicationInfo.theme);
             tryInitBoxPlugin();
-            ensureInit();
         } else {
             context = callerContext;
         }
@@ -70,10 +70,12 @@ public class BoxRuntime {
         return extras.get(key);
     }
 
+    @Keep
     public static Context getContext() {
         return context;
     }
 
+    @Keep
     public static AssetManager getAssetManager() {
         return assetManager;
     }
