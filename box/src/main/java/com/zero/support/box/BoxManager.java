@@ -46,18 +46,25 @@ public class BoxManager {
     }
 
     public static Box load(Context context, File path, File lib) {
-        return load(context, context.getClassLoader(), path, lib);
+        return load(context, context.getClassLoader(), path, lib, false);
     }
 
-    public static Box load(Context context, ClassLoader parent, File apk, File lib) {
+    public static Box load(Context context, ClassLoader parent, File apk, File lib, boolean host) {
         try {
-            String path = apk.getCanonicalPath();
-            PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(path, PackageManager.GET_META_DATA | PackageManager.GET_ACTIVITIES);
-            packageInfo.applicationInfo.sourceDir = path;
-            packageInfo.applicationInfo.publicSourceDir = path;
-            packageInfo.applicationInfo.nativeLibraryDir = lib.getCanonicalPath();
-            DexClassLoader classLoader = new DexClassLoader(path, apk.getParentFile().getCanonicalPath(), lib.getCanonicalPath(), parent);
-            Box box = new Box(packageInfo.packageName,context,packageInfo, classLoader);
+            PackageInfo packageInfo;
+            ClassLoader classLoader;
+            if (host) {
+                classLoader = context.getClassLoader();
+                packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),PackageManager.GET_META_DATA);
+            } else {
+                String path = apk.getCanonicalPath();
+                packageInfo = context.getPackageManager().getPackageArchiveInfo(path, PackageManager.GET_META_DATA | PackageManager.GET_ACTIVITIES);
+                packageInfo.applicationInfo.sourceDir = path;
+                packageInfo.applicationInfo.publicSourceDir = path;
+                packageInfo.applicationInfo.nativeLibraryDir = lib.getCanonicalPath();
+                classLoader = new DexClassLoader(path, apk.getParentFile().getCanonicalPath(), lib.getCanonicalPath(), parent);
+            }
+            Box box = new Box(packageInfo.packageName, context, packageInfo, classLoader, host);
             synchronized (boxes) {
                 boxes.put(packageInfo.packageName, box);
             }

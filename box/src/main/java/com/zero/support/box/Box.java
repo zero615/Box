@@ -7,36 +7,65 @@ import android.content.pm.PackageInfo;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.text.TextUtils;
+import android.util.Log;
+import android.util.Pair;
 
-import java.lang.reflect.InvocationHandler;
+import com.zero.support.box.invoke.IInvocation;
+
+import com.zero.support.box.invoke.LocalInvocation;
+
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Box {
     private PackageInfo packageInfo;
-    private BoxRuntime runtime;
     private final Map<String, Object> extras = new HashMap<>();
-    public ClassLoader classLoader;
-    public AssetManager assetManager;
+    private ClassLoader classLoader;
+    private AssetManager assetManager;
     private Context context;
     private String boxName;
+    private boolean host;
+    private IInvocation invocation;
 
-
-    public Box(String boxName, Context callerContext, PackageInfo packageInfo, ClassLoader classLoader) {
+    public Box(String boxName, Context callerContext, PackageInfo packageInfo, ClassLoader classLoader, boolean host) {
         this.boxName = boxName;
         this.packageInfo = packageInfo;
-        if (classLoader == null || classLoader == Box.class.getClassLoader()) {
-            this.classLoader = Box.class.getClassLoader();
+        this.classLoader = classLoader;
+        this.host = host;
+        this.invocation = new InvocationManager(this);
+        if (host) {
             this.context = callerContext;
             this.assetManager = callerContext.getAssets();
         } else {
-            this.classLoader = classLoader;
             createAssetManager();
-            this.context = createBoxContext(callerContext, getDefaultTheme());
+            this.context = invocation.createBoxContext(callerContext, 0);
         }
-        this.runtime = new BoxRuntime(this);
-        runtime.init(boxName, callerContext, callerContext.getClassLoader(), context, classLoader, packageInfo, extras);
+
+        init(boxName, callerContext, callerContext.getClassLoader(), context, classLoader, packageInfo, invocation, extras);
+    }
+
+    final void init(String boxName, Context callerContext, ClassLoader caller, Context context, ClassLoader loader, PackageInfo info, IInvocation invocation, Map<String, Object> extras) {
+        try {
+            Class<?> initializer = Class.forName(boxName + ".BoxInitializer", true, loader);
+            Method init = initializer.getDeclaredMethod("init", String.class, Context.class, ClassLoader.class, PackageInfo.class, Context.class, Pair.class, Map.class);
+            init.invoke(null, boxName, callerContext, caller, info, context, new Pair(invocation, IInvocation.class), extras);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            Log.e("BoxRuntime", "initializer: failed for " + boxName);
+        }
+        try {
+            Class<?> boxPlugin = Class.forName(boxName + ".BoxPlugin", true, loader);
+            Method onPluginLoaded = boxPlugin.getDeclaredMethod("onPluginLoaded");
+            onPluginLoaded.invoke(null);
+        } catch (Throwable e) {
+            Log.e("BoxRuntime", "tryInitBoxPlugin: failed for " + boxName);
+        }
+    }
+
+    public <T> T getBoxService(String name, Class<?> cls) {
+        Pair<Object, Class> pair = invocation.getInvocationTarget(name);
+        return LocalInvocation.asInvocation(pair, cls);
     }
 
     public String getBoxName() {
@@ -45,6 +74,10 @@ public class Box {
 
     public Context getContext() {
         return context;
+    }
+
+    public AssetManager getAssetManager() {
+        return assetManager;
     }
 
     private void createAssetManager() {
@@ -87,7 +120,6 @@ public class Box {
         synchronized (extras) {
             extras.clear();
         }
-
     }
 
     Map<String, Object> getExtras() {
@@ -103,77 +135,8 @@ public class Box {
         return classLoader;
     }
 
-
-    public int getTheme(Activity activity) {
-        PackageInfo info = getPackageInfo();
-        String name = activity.getClass().getName();
-        ActivityInfo[] activities = info.activities;
-        int theme = info.applicationInfo.theme;
-        if (activities != null) {
-            for (ActivityInfo activityInfo : activities) {
-                String target;
-                if (activityInfo.targetActivity != null) {
-                    target = activityInfo.targetActivity;
-                } else {
-                    target = activityInfo.name;
-                }
-                if (TextUtils.equals(activityInfo.name, name)) {
-                    if (activityInfo.theme != 0) {
-                        theme = activityInfo.theme;
-                    }
-                    break;
-                }
-            }
-        }
-        return theme;
+    public boolean isPlugin() {
+        return !host;
     }
 
-    public int getDefaultTheme() {
-        return getPackageInfo().applicationInfo.theme;
-    }
-
-    public Context createBoxContext(Context base, int theme) {
-        if (theme == 0) {
-            theme = getDefaultTheme();
-        }
-        return new BoxContext(classLoader, packageInfo, base, newResources(base), theme);
-    }
-
-    public Context createBoxContextForActivity(Activity activity, Context base) {
-        int theme = getTheme(activity);
-        return createBoxContext(base, theme);
-    }
-
-    private Resources newResources(Context context) {
-        Resources resource = context.getResources();
-        return new BoxResources(classLoader, packageInfo.packageName, assetManager, resource);
-    }
-
-    public InvocationHandler getCallerInvokeHandler(String name) {
-        String realName = "@CallerHandler:" + name;
-        synchronized (extras) {
-            return (InvocationHandler) extras.get(realName);
-        }
-    }
-
-    public void registerCallerInvokeHandler(String name, InvocationHandler handler) {
-        String realName = "@CallerHandler:" + name;
-        synchronized (extras) {
-            extras.put(realName, handler);
-        }
-    }
-
-    public void unregisterCallerInvokeHandler(String name) {
-        String realName = "@CallerHandler:" + name;
-        synchronized (extras) {
-            extras.remove(realName);
-        }
-    }
-
-    public InvocationHandler getBoxInvokeHandler(String name) {
-        synchronized (extras) {
-            String realName = "@BoxHandler:" + name;
-            return (InvocationHandler) extras.get(realName);
-        }
-    }
 }

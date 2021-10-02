@@ -25,6 +25,7 @@ public class RuntimeGenerator {
         ClassName context = ClassName.bestGuess("android.content.Context");
         ClassName packageInfo = ClassName.bestGuess("android.content.pm.PackageInfo");
         ClassName keep = ClassName.bestGuess("androidx.annotation.Keep");
+        ClassName pair = ClassName.bestGuess("android.util.Pair");
         ClassName boxRuntime = ClassName.bestGuess("com.zero.support.box.plugin.BoxRuntime");
         MethodSpec init = MethodSpec.methodBuilder("init")
                 .addAnnotation(keep)
@@ -34,11 +35,11 @@ public class RuntimeGenerator {
                 .addParameter(ParameterSpec.builder(ClassLoader.class, "caller").build())
                 .addParameter(ParameterSpec.builder(packageInfo, "packageInfo").build())
                 .addParameter(ParameterSpec.builder(context, "context").build())
-                .addParameter(ParameterSpec.builder(InvocationHandler.class, "handler").build())
+                .addParameter(ParameterSpec.builder(pair, "target").build())
                 .addParameter(ParameterSpec.builder(Map.class, "extras").build())
                 .returns(TypeName.VOID)
                 .addCode(CodeBlock.builder()
-                        .addStatement("com.zero.support.box.plugin.BoxRuntime.init(name, callerContext, caller, packageInfo, context, handler, extras)")
+                        .addStatement("com.zero.support.box.plugin.BoxRuntime.init(name, callerContext, caller, packageInfo, context, target, extras)")
                         .build())
                 .build();
 

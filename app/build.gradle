@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.zero.box.sample"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -32,6 +32,9 @@ android {
 }
 
 dependencies {
+    api 'com.github.zero615.Support:core:1.0.2'
+    api 'com.github.zero615.Support:ui:1.0.2'
+    implementation project(":box")
     implementation 'androidx.annotation:annotation:1.2.0'
     implementation project(':plugin')
     implementation 'androidx.appcompat:appcompat:1.2.0'

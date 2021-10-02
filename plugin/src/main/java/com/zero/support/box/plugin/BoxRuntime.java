@@ -1,10 +1,12 @@
 package com.zero.support.box.plugin;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
+import android.util.Pair;
 
-import java.lang.reflect.InvocationHandler;
+import com.zero.support.box.plugin.invoke.IInvocation;
+import com.zero.support.box.plugin.invoke.LocalInvocation;
+
 import java.util.Map;
 
 
@@ -16,40 +18,20 @@ public class BoxRuntime {
     private static PackageInfo packageInfo;
     private static Context context;
     private static Map<String, Object> extras;
-    private static InvocationHandler callerHandler;
+    private static IInvocation callerInvocation;
+    private static IInvocation invocation;
 
-    public static void init(String name, Context callerContext, ClassLoader caller, PackageInfo packageInfo, Context context, InvocationHandler handler, Map<String, Object> extra) {
+    public static void init(String name, Context callerContext, ClassLoader caller, PackageInfo packageInfo, Context context, Pair<Object, Class> invocation, Map<String, Object> extra) {
         BoxRuntime.boxName = name;
         BoxRuntime.caller = caller;
         BoxRuntime.callerContext = callerContext;
         BoxRuntime.packageInfo = packageInfo;
-        BoxRuntime.callerHandler = handler;
+        BoxRuntime.callerInvocation = LocalInvocation.asInvocation(invocation, IInvocation.class);
         BoxRuntime.extras = extra;
     }
 
     public static String getBoxName() {
         return boxName;
-    }
-
-    public static InvocationHandler registerInvocationHandler(String name, InvocationHandler handler) {
-        name = "@BoxHandler:" + name;
-        synchronized (extras) {
-            return (InvocationHandler) extras.put(name, handler);
-        }
-    }
-
-    public static InvocationHandler unregisterInvocationHandler(String name) {
-        name = "@BoxHandler:" + name;
-        synchronized (extras) {
-            return (InvocationHandler) extras.remove(name);
-        }
-    }
-
-    public static InvocationHandler getCallerInvocationHandler(String name) {
-        name = "@CallerHandler:" + name;
-        synchronized (extras) {
-            return (InvocationHandler) extras.remove(name);
-        }
     }
 
 
@@ -81,21 +63,11 @@ public class BoxRuntime {
         return caller != BoxRuntime.class.getClassLoader();
     }
 
-    public static Context createBoxContext(Context base, int theme) {
-        return (Context) callCallerMethod("_createBoxContext", base, theme);
+    public static IInvocation getCallerInvocation() {
+        return callerInvocation;
     }
 
-    public static Context createBoxContextForActivity(Activity activity, Context base) {
-        return (Context) callCallerMethod("_createBoxContextForActivity", activity, base);
+    public static IInvocation getInvocation() {
+        return invocation;
     }
-
-    public static Object callCallerMethod(String name, Object... args) {
-        try {
-            return (InvocationHandler) callerHandler.invoke(name, null, args);
-        } catch (Throwable throwable) {
-            //ignore
-        }
-        return null;
-    }
-
 }

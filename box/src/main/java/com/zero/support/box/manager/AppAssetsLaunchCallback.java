@@ -27,16 +27,6 @@ public class AppAssetsLaunchCallback implements LauncherCallback {
         }
         return launcher.getCurrentPath() != null;
     }
-
-    @Override
-    public Box onLoadLauncher(Context context, Launcher launcher, ClassLoader parent) {
-        String next = launcher.getCurrentPath();
-        File target = new File(next, "base.apk");
-        File libRoot = new File(next, "lib");
-        File lib = new File(libRoot, Sdk.getAbiName(libRoot));
-        return BoxManager.load(context, parent, target, lib);
-    }
-
     private void installFromAsset(Context context, Launcher launcher) {
         launcher.enableNext();
         //onInstallSdk

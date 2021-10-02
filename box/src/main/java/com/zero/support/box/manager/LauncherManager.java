@@ -51,12 +51,14 @@ public class LauncherManager {
         }
     }
 
-    public boolean install(String name) {
+    public Launcher install(String name) {
         return install(root, name);
     }
 
-    public boolean install(File root, String name) {
-        return launcherCallback.onInstallLauncher(app, getLauncher(root, name));
+    public Launcher install(File root, String name) {
+        Launcher launcher = getLauncher(root,name);
+        launcherCallback.onInstallLauncher(app, launcher);
+        return launcher;
     }
 
     public Launcher getLauncher(String name) {
