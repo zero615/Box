@@ -57,18 +57,7 @@ public class BoxManager {
             packageInfo.applicationInfo.publicSourceDir = path;
             packageInfo.applicationInfo.nativeLibraryDir = lib.getCanonicalPath();
             DexClassLoader classLoader = new DexClassLoader(path, apk.getParentFile().getCanonicalPath(), lib.getCanonicalPath(), parent);
-            Box box = new Box(packageInfo, classLoader);
-            try {
-                String runtimeClass = packageInfo.packageName + NAME_RUNTIME;
-                Class<?> cls = classLoader.loadClass(runtimeClass);
-                BoxRuntime runtime = new BoxRuntime(cls);
-                runtime.init(context, context.getClassLoader(), packageInfo, box.getExtras());
-                box.attachBoxRuntime(runtime);
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.e("box", "load: " + e.getMessage());
-                //ignore
-            }
+            Box box = new Box(packageInfo.packageName,context,packageInfo, classLoader);
             synchronized (boxes) {
                 boxes.put(packageInfo.packageName, box);
             }

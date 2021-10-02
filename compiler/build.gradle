@@ -10,6 +10,5 @@ dependencies {
     implementation 'com.google.auto.service:auto-service:1.0-rc7'
     annotationProcessor 'com.google.auto.service:auto-service:1.0-rc7'
     implementation "com.android.tools.build:gradle:4.1.2"
-    implementation 'com.android.tools.build:gradle-api:4.2.1'
 }
 

@@ -1,50 +1,51 @@
 package com.zero.support.box;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
-import android.content.res.AssetManager;
+import android.util.Log;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-public class BoxRuntime {
-    private Method getAssetManager;
-    private Method init;
-    private Method getContext;
+public class BoxRuntime implements InvocationHandler {
+    private final Box box;
 
-    public BoxRuntime(Class<?> box) {
+    public BoxRuntime(Box box) {
+        this.box = box;
+    }
+
+    final void init(String boxName, Context callerContext, ClassLoader caller, Context context, ClassLoader loader, PackageInfo info, Map<String, Object> extras) {
+
         try {
-            init = box.getDeclaredMethod("init", Context.class, ClassLoader.class, PackageInfo.class, Map.class);
-            getAssetManager = box.getDeclaredMethod("getAssetManager");
-            getContext = box.getDeclaredMethod("getContext");
+            Class<?> initializer = Class.forName(boxName + ".BoxInitializer", true, loader);
+            Method init = initializer.getDeclaredMethod("init", String.class, Context.class, ClassLoader.class, PackageInfo.class, Context.class, InvocationHandler.class, Map.class);
+            init.invoke(null, boxName, callerContext, caller, info, context, this, extras);
         } catch (Throwable e) {
             e.printStackTrace();
+            Log.e("BoxRuntime", "initializer: failed for " + boxName);
         }
-    }
-
-    final void init(android.content.Context context, ClassLoader caller, PackageInfo info, Map<String, Object> extras) {
         try {
-            init.invoke(null, context, caller, info, extras);
+            Class<?> boxPlugin = Class.forName(boxName + ".BoxPlugin", true, loader);
+            Method onPluginLoaded = boxPlugin.getDeclaredMethod("onPluginLoaded");
+            onPluginLoaded.invoke(null);
         } catch (Throwable e) {
-            throw new RuntimeException(e);
+            Log.e("BoxRuntime", "tryInitBoxPlugin: failed for " + boxName);
         }
+
     }
 
 
-    public final AssetManager getAssetManager() {
-        try {
-            return (AssetManager) getAssetManager.invoke(null);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        String name = String.valueOf(proxy);
+        switch (name) {
+            case "_createBoxContextForActivity":
+                return box.createBoxContextForActivity((Activity) args[0], (Context) args[1]);
+            case "_createBoxContext":
+                return box.createBoxContext((Context) args[0], (int) args[1]);
         }
+        return null;
     }
-
-    public final Context getContext() {
-        try {
-            return (Context) getContext.invoke(null);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }
