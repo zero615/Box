@@ -27,25 +27,25 @@ public class BoxRuntime {
         BoxRuntime.extras = extra;
     }
 
-    public String getBoxName() {
+    public static String getBoxName() {
         return boxName;
     }
 
-    public InvocationHandler registerInvocationHandler(String name, InvocationHandler handler) {
+    public static InvocationHandler registerInvocationHandler(String name, InvocationHandler handler) {
         name = "@BoxHandler:" + name;
         synchronized (extras) {
             return (InvocationHandler) extras.put(name, handler);
         }
     }
 
-    public InvocationHandler unregisterInvocationHandler(String name) {
+    public static InvocationHandler unregisterInvocationHandler(String name) {
         name = "@BoxHandler:" + name;
         synchronized (extras) {
             return (InvocationHandler) extras.remove(name);
         }
     }
 
-    public InvocationHandler getCallerInvocationHandler(String name) {
+    public static InvocationHandler getCallerInvocationHandler(String name) {
         name = "@CallerHandler:" + name;
         synchronized (extras) {
             return (InvocationHandler) extras.remove(name);
