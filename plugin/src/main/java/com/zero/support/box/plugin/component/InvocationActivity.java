@@ -106,5 +106,27 @@ public class InvocationActivity implements IInvocationActivity {
 
     }
 
+    public void finish() {
+        activity.finish();
+    }
 
+    public void startActivity(Intent intent) {
+        activity.startActivity(intent);
+    }
+
+    public void startActivity(Intent intent, Bundle options) {
+        activity.startActivity(intent, options);
+    }
+
+    public Intent getIntent() {
+        return activity.getIntent();
+    }
+
+    public void startActivityForResult(Intent intent, int requestCode) {
+        startActivityForResult(intent, requestCode, null);
+    }
+
+    public void startActivityForResult(Intent intent, int requestCode, Bundle options) {
+        activity.startActivityForResult(intent, requestCode, options);
+    }
 }

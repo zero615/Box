@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.IBinder;
 
-import com.zero.support.box.plugin.invoke.BoxName;
-
 public interface IInvocationService {
 
     @BoxName("attach")

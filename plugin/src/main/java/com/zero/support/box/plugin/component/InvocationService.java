@@ -1,9 +1,11 @@
 package com.zero.support.box.plugin.component;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.IBinder;
 
 import com.zero.support.box.plugin.invoke.IInvocationService;
@@ -69,5 +71,24 @@ public class InvocationService implements IInvocationService {
     @Override
     public void onDestroy() {
 
+    }
+
+    public void stopSelf() {
+        service.stopSelf();
+    }
+
+    public void stopSelf(int startId) {
+        service.stopSelf(startId);
+    }
+
+    public final void startForeground(int id, Notification notification) {
+        service.startForeground(id, notification);
+    }
+
+
+    public final void startForeground(int id, Notification notification, int foregroundServiceType) {
+        if (Build.VERSION.SDK_INT >= 29) {
+            service.startForeground(id, notification, foregroundServiceType);
+        }
     }
 }

@@ -14,7 +14,7 @@ import android.os.Bundle;
 
 import java.util.ArrayList;
 
-public interface IInvocationContentProvider {
+public interface IInvocationProvider {
     @BoxName("attach")
     Context attach(ContentProvider provider, Context context, ProviderInfo info);
 

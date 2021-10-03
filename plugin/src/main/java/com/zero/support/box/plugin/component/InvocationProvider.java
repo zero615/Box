@@ -12,11 +12,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 
-import com.zero.support.box.plugin.invoke.IInvocationContentProvider;
+import com.zero.support.box.plugin.invoke.IInvocationProvider;
 
 import java.util.ArrayList;
 
-public class InvocationProvider implements IInvocationContentProvider {
+public class InvocationProvider implements IInvocationProvider {
     private ContentProvider provider;
 
     public final ContentProvider requireContentProvider() {
