@@ -18,6 +18,9 @@ public class LocalInvocation {
         if (target == null) {
             return null;
         }
+        if (targetCls==cls){
+            return (T) target;
+        }
         synchronized (invocations) {
             Object o = findInvocationByTarget(target);
             if (o == null) {

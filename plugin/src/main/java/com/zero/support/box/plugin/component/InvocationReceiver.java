@@ -13,7 +13,7 @@ public class InvocationReceiver implements IInvocationReceiver {
     @Override
     public final void onReceive(BroadcastReceiver receiver, Context context, Intent intent) {
         this.receiver = receiver;
-        onReceiver(context, intent);
+        onReceive(context, intent);
     }
 
     public final Bundle getResultExtras(boolean makeMap) {
@@ -32,7 +32,7 @@ public class InvocationReceiver implements IInvocationReceiver {
         return receiver.getDebugUnregister();
     }
 
-    public void onReceiver(Context context, Intent intent) {
+    public void onReceive(Context context, Intent intent) {
 
     }
 

@@ -77,8 +77,8 @@ public class InvocationActivity implements IInvocationActivity {
     }
 
     @Override
-    public void onBackPressed() {
-
+    public boolean onBackPressed() {
+        return false;
     }
 
     @Override

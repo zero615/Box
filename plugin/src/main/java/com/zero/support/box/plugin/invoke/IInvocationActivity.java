@@ -40,7 +40,7 @@ public interface IInvocationActivity {
     void onRestoreInstanceState(Bundle savedInstanceState);
 
     @BoxName("onBackPressed")
-    void onBackPressed();
+    boolean onBackPressed();
 
     @BoxName("onActivityResult")
     void onActivityResult(int requestCode, int resultCode, Intent data);
