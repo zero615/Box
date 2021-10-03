@@ -47,7 +47,7 @@ public class BoxResources extends Resources {
     @Keep
     public void setImpl(ResourcesImpl impl) {
         if (field == null) {
-            Log.e("xgf", "setImpl: failed for " + impl);
+            Log.e("box", "setImpl: failed for " + impl);
         }
         try {
             ResourcesImpl origin = (ResourcesImpl) field.get(this);

@@ -5,11 +5,11 @@ import android.content.Context;
 import android.util.Pair;
 
 public interface IInvocation {
-    @BoxName("registerInvocationTarget")
-    public void registerInvocationTarget(String name, Pair<Object, Class> target) ;
+    @BoxName("addInvocationTarget")
+    void addInvocationTarget(String name, Pair<Object, Class> target) ;
 
-    @BoxName("unregisterInvocationTarget")
-    public void unregisterInvocationTarget(String name);
+    @BoxName("removeInvocationTarget")
+    void removeInvocationTarget(String name);
 
     @BoxName("getInvocationTarget")
     Pair<Object,Class> getInvocationTarget(String name);

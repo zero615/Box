@@ -8,7 +8,7 @@ import java.util.WeakHashMap;
 
 
 public class LocalInvocation {
-    private static final Map<Object, Object> invokes = new WeakHashMap<>();
+    private static final WeakHashMap<Object, Object> invocations = new WeakHashMap<>();
 
     public static <T> T asInvocation(Pair<Object, Class> target, Class<?> cls) {
         return asInvocation(target.first, target.second, cls);
@@ -18,11 +18,12 @@ public class LocalInvocation {
         if (target == null) {
             return null;
         }
-        synchronized (invokes) {
-            Object o = queryKey(target);
+        synchronized (invocations) {
+            Object o = findInvocationByTarget(target);
             if (o == null) {
-                o = Proxy.newProxyInstance(cls.getClassLoader(), new Class[]{cls}, new ReflectInvoke( targetCls, cls));
-                invokes.put(o, target);
+                ReflectInvocationHandler handler =  new ReflectInvocationHandler( targetCls, cls);
+                o = Proxy.newProxyInstance(cls.getClassLoader(), new Class[]{cls},handler);
+                invocations.put(o, target);
             }
             return (T) o;
         }
@@ -32,22 +33,22 @@ public class LocalInvocation {
         if (target == null) {
             return null;
         }
-        synchronized (invokes) {
-            Object o = queryKey(target);
+        synchronized (invocations) {
+            Object o = findInvocationByTarget(target);
             return (T) o;
         }
     }
 
 
     public static Object getTarget(Object invocation) {
-        synchronized (invokes) {
-            return invokes.get(invocation);
+        synchronized (invocations) {
+            return invocations.get(invocation);
         }
     }
 
-    private static Object queryKey(Object target) {
+    private static Object findInvocationByTarget(Object target) {
         Object key = null;
-        for (Map.Entry<Object, Object> entry : invokes.entrySet()) {
+        for (Map.Entry<Object, Object> entry : invocations.entrySet()) {
             if (entry.getValue() == target) {
                 key = entry.getKey();
                 break;
@@ -57,10 +58,10 @@ public class LocalInvocation {
     }
 
     public static void removeInvocation(Object target) {
-        synchronized (invokes) {
-            Object key = queryKey(target);
+        synchronized (invocations) {
+            Object key = findInvocationByTarget(target);
             if (key != null) {
-                invokes.remove(target);
+                invocations.remove(target);
             }
         }
     }

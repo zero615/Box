@@ -25,7 +25,7 @@ public class InvocationManager implements IInvocation {
     }
 
     @Override
-    public void registerInvocationTarget(String name, Pair<Object, Class> target) {
+    public void addInvocationTarget(String name, Pair<Object, Class> target) {
         synchronized (invokes) {
             Pair<Object, Class> pair = invokes.put(name, target);
             if (pair != null) {
@@ -35,7 +35,7 @@ public class InvocationManager implements IInvocation {
     }
 
     @Override
-    public void unregisterInvocationTarget(String name) {
+    public void removeInvocationTarget(String name) {
         synchronized (invokes) {
             Pair<Object, Class> pair = invokes.remove(name);
             if (pair != null) {

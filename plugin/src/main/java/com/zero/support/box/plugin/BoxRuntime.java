@@ -19,7 +19,6 @@ public class BoxRuntime {
     private static Context context;
     private static Map<String, Object> extras;
     private static IInvocation callerInvocation;
-    private static IInvocation invocation;
 
     public static void init(String name, Context callerContext, ClassLoader caller, PackageInfo packageInfo, Context context, Pair<Object, Class> invocation, Map<String, Object> extra) {
         BoxRuntime.boxName = name;
@@ -67,7 +66,7 @@ public class BoxRuntime {
         return callerInvocation;
     }
 
-    public static IInvocation getInvocation() {
-        return invocation;
+    public static <T> T getCallerService(String name, Class<T> cls) {
+        return LocalInvocation.asInvocation(callerInvocation.getInvocationTarget(name),cls);
     }
 }

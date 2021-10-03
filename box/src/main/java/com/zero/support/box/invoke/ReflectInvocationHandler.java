@@ -1,14 +1,14 @@
-package com.zero.support.box.plugin.invoke;
+package com.zero.support.box.invoke;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-public class ReflectInvoke implements InvocationHandler {
+public class ReflectInvocationHandler implements InvocationHandler {
     ClassHolder targetHolder;
     ClassHolder localHolder;
 
 
-    public ReflectInvoke(Class<?> targetCls, Class<?> local) {
+    public ReflectInvocationHandler(Class<?> targetCls, Class<?> local) {
         targetHolder = new ClassHolder(targetCls, false);
         localHolder = new ClassHolder(local, true);
     }
@@ -16,6 +16,9 @@ public class ReflectInvoke implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (method.getDeclaringClass() == Object.class) {
+            if (method.getName().equals("equals")) {
+                return args[0] == proxy;
+            }
             return method.invoke(this, args);
         }
         MethodHolder localMethod = localHolder.getMethod(method.getName());
@@ -27,7 +30,6 @@ public class ReflectInvoke implements InvocationHandler {
                 args[i] = LocalInvocation.asInvocation(args[i], localMethod.params[i], cls);
             }
         }
-
         return targetHolder.method.invoke(LocalInvocation.getTarget(proxy), args);
     }
 

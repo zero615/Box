@@ -14,6 +14,7 @@ import com.zero.support.box.invoke.IInvocation;
 
 import com.zero.support.box.invoke.LocalInvocation;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +28,7 @@ public class Box {
     private String boxName;
     private boolean host;
     private IInvocation invocation;
+    private volatile boolean prepared;
 
     public Box(String boxName, Context callerContext, PackageInfo packageInfo, ClassLoader classLoader, boolean host) {
         this.boxName = boxName;
@@ -41,8 +43,18 @@ public class Box {
             createAssetManager();
             this.context = invocation.createBoxContext(callerContext, 0);
         }
+    }
 
-        init(boxName, callerContext, callerContext.getClassLoader(), context, classLoader, packageInfo, invocation, extras);
+    public boolean isPrepared() {
+        return prepared;
+    }
+
+    public void prepare() {
+        if (prepared) {
+            return;
+        }
+        prepared = true;
+        init(boxName, Sdk.getApplication(), Sdk.getApplication().getClassLoader(), context, classLoader, packageInfo, invocation, extras);
     }
 
     final void init(String boxName, Context callerContext, ClassLoader caller, Context context, ClassLoader loader, PackageInfo info, IInvocation invocation, Map<String, Object> extras) {
@@ -54,16 +66,9 @@ public class Box {
             e.printStackTrace();
             Log.e("BoxRuntime", "initializer: failed for " + boxName);
         }
-        try {
-            Class<?> boxPlugin = Class.forName(boxName + ".BoxPlugin", true, loader);
-            Method onPluginLoaded = boxPlugin.getDeclaredMethod("onPluginLoaded");
-            onPluginLoaded.invoke(null);
-        } catch (Throwable e) {
-            Log.e("BoxRuntime", "tryInitBoxPlugin: failed for " + boxName);
-        }
     }
 
-    public <T> T getBoxService(String name, Class<?> cls) {
+    public <T> T getBoxService(String name, Class<T> cls) {
         Pair<Object, Class> pair = invocation.getInvocationTarget(name);
         return LocalInvocation.asInvocation(pair, cls);
     }
@@ -139,4 +144,7 @@ public class Box {
         return !host;
     }
 
+    public IInvocation getInvocation() {
+        return invocation;
+    }
 }
