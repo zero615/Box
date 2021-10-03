@@ -30,7 +30,11 @@ public class ReflectInvocationHandler implements InvocationHandler {
                 args[i] = LocalInvocation.asInvocation(args[i], localMethod.params[i], cls);
             }
         }
-        return targetHolder.method.invoke(LocalInvocation.getTarget(proxy), args);
+        Object o = targetHolder.method.invoke(LocalInvocation.getTarget(proxy), args);
+        if (!isCurrent(targetHolder.returnCls)) {
+            o = LocalInvocation.asInvocation(o, targetHolder.returnCls, localMethod.returnCls);
+        }
+        return o;
     }
 
 
