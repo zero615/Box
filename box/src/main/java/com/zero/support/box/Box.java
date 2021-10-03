@@ -1,33 +1,27 @@
 package com.zero.support.box;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.res.AssetManager;
-import android.content.res.Resources;
-import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
-import com.zero.support.box.invoke.IInvocation;
+import com.zero.support.box.plugin.invoke.IInvocation;
+import com.zero.support.box.plugin.invoke.LocalInvocation;
 
-import com.zero.support.box.invoke.LocalInvocation;
-
-import java.io.File;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Box {
-    private PackageInfo packageInfo;
+    private final PackageInfo packageInfo;
     private final Map<String, Object> extras = new HashMap<>();
-    private ClassLoader classLoader;
+    private final ClassLoader classLoader;
     private AssetManager assetManager;
-    private Context context;
+    private final Context context;
     private String boxName;
-    private boolean host;
-    private IInvocation invocation;
+    private final boolean host;
+    private final IInvocation invocation;
     private volatile boolean prepared;
 
     public Box(String boxName, Context callerContext, PackageInfo packageInfo, ClassLoader classLoader, boolean host) {
@@ -43,6 +37,10 @@ public class Box {
             createAssetManager();
             this.context = invocation.createBoxContext(callerContext, 0);
         }
+    }
+
+    public void setBoxName(String boxName) {
+        this.boxName = boxName;
     }
 
     public boolean isPrepared() {

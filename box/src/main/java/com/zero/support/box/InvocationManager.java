@@ -8,8 +8,9 @@ import android.content.res.Resources;
 import android.text.TextUtils;
 import android.util.Pair;
 
-import com.zero.support.box.invoke.IInvocation;
-import com.zero.support.box.invoke.LocalInvocation;
+
+import com.zero.support.box.plugin.invoke.IInvocation;
+import com.zero.support.box.plugin.invoke.LocalInvocation;
 
 import java.util.HashMap;
 import java.util.Map;
