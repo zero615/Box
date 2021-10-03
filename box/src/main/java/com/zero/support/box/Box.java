@@ -8,6 +8,8 @@ import android.util.Pair;
 
 import com.zero.support.box.plugin.invoke.IInvocation;
 import com.zero.support.box.plugin.invoke.LocalInvocation;
+import com.zero.support.box.plugin.invoke.MethodInvoke;
+import com.zero.support.box.plugin.invoke.TargetHolder;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -21,7 +23,8 @@ public class Box {
     private final Context context;
     private String boxName;
     private final boolean host;
-    private final IInvocation invocation;
+    private final InvocationManager invocation;
+    private IInvocation boxInvocation;
     private volatile boolean prepared;
 
     public Box(String boxName, Context callerContext, PackageInfo packageInfo, ClassLoader classLoader, boolean host) {
@@ -52,22 +55,27 @@ public class Box {
             return;
         }
         prepared = true;
-        init(boxName, Sdk.getApplication(), Sdk.getApplication().getClassLoader(), context, classLoader, packageInfo, invocation, extras);
+        Object[] objects = init(boxName, Sdk.getApplication(), Sdk.getApplication().getClassLoader(), context, classLoader, packageInfo, invocation, extras);
+        if (objects != null) {
+            boxInvocation = LocalInvocation.asInvocation((Object) objects[0], (Class<?>) objects[1], (Map<String, Object[]>) objects[2], IInvocation.class);
+            LocalInvocation.setTargetInvocation(boxInvocation);
+        }
     }
 
-    final void init(String boxName, Context callerContext, ClassLoader caller, Context context, ClassLoader loader, PackageInfo info, IInvocation invocation, Map<String, Object> extras) {
+    final Object[] init(String boxName, Context callerContext, ClassLoader caller, Context context, ClassLoader loader, PackageInfo info, InvocationManager invocation, Map<String, Object> extras) {
         try {
             Class<?> initializer = Class.forName(boxName + ".BoxInitializer", true, loader);
-            Method init = initializer.getDeclaredMethod("init", String.class, Context.class, ClassLoader.class, PackageInfo.class, Context.class, Pair.class, Map.class);
-            init.invoke(null, boxName, callerContext, caller, info, context, new Pair(invocation, IInvocation.class), extras);
+            Method init = initializer.getDeclaredMethod("init", String.class, Context.class, ClassLoader.class, PackageInfo.class, Context.class, Object.class,Class.class,Map.class, Map.class);
+            return (Object[]) init.invoke(null, boxName, callerContext, caller, info, context,invocation,IInvocation.class, MethodInvoke.createMethod(IInvocation.class,false), extras);
         } catch (Throwable e) {
             e.printStackTrace();
             Log.e("BoxRuntime", "initializer: failed for " + boxName);
         }
+        return null;
     }
 
     public <T> T getBoxService(String name, Class<T> cls) {
-        Pair<Object, Class> pair = invocation.getInvocationTarget(name);
+        TargetHolder pair = invocation.getInvocationTarget(name);
         return LocalInvocation.asInvocation(pair, cls);
     }
 

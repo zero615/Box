@@ -4,16 +4,20 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Pair;
 
+import java.util.Map;
+
 public interface IInvocation {
     @BoxName("addInvocationTarget")
-    void addInvocationTarget(String name, Pair<Object, Class> target) ;
+    void addInvocationTarget(String name, Object target, Class<?> cls);
 
     @BoxName("removeInvocationTarget")
     void removeInvocationTarget(String name);
+//
+//    @BoxName("getInvocationTarget")
+//    Pair<Object, Class> getInvocationTarget(String name);
 
-    @BoxName("getInvocationTarget")
-    Pair<Object,Class> getInvocationTarget(String name);
-
+    @BoxName("getInvocationMethods")
+    Map<String, Object[]> getInvocationMethods(Class<?> cls);
 
     @BoxName("createBoxContext")
     Context createBoxContext(Context context, int theme);

@@ -1,16 +1,22 @@
 package com.zero.support.box.plugin.invoke;
 
+import android.util.Log;
+
+import com.zero.support.box.plugin.BoxInvocation;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 public class ReflectInvocationHandler implements InvocationHandler {
-    ClassHolder targetHolder;
-    ClassHolder localHolder;
+
+    Map<String, Object[]> targetMethods;
+    Map<String, Object[]> localMethods;
 
 
-    public ReflectInvocationHandler(Class<?> targetCls, Class<?> local) {
-        targetHolder = new ClassHolder(targetCls, false);
-        localHolder = new ClassHolder(local, true);
+    public ReflectInvocationHandler(Map<String, Object[]> targetMethods, Class<?> local) {
+        this.targetMethods = targetMethods;
+        this.localMethods = MethodInvoke.createMethod(local, true);
     }
 
     @Override
@@ -21,19 +27,32 @@ public class ReflectInvocationHandler implements InvocationHandler {
             }
             return method.invoke(this, args);
         }
-        MethodHolder localMethod = localHolder.getMethod(method.getName());
-        MethodHolder targetHolder = this.targetHolder.getMethod(localMethod.name);
+
+
+        Object[] locals = localMethods.get(method.getName());
+        if (locals == null) {
+            Log.e("box", "invoke: why");
+            return null;
+        }
+        Object[] targets = this.targetMethods.get(MethodInvoke.getBoxName(locals));
+        if (targets == null) {
+            Log.e("box", "invoke: why");
+            return null;
+        }
         Class<?> cls;
-        for (int i = 0; i < targetHolder.params.length; i++) {
-            cls = targetHolder.params[i];
+        Class<?>[] params = MethodInvoke.getParameterTypes(targets);
+        Class<?>[] localParams = MethodInvoke.getParameterTypes(locals);
+        for (int i = 0; i < params.length; i++) {
+            cls = params[i];
             if (cls.isInterface() && !isCurrent(cls)) {
-                args[i] = LocalInvocation.asInvocation(args[i], localMethod.params[i], cls);
+                args[i] = LocalInvocation.asInvocation(args[i], localParams[i], null, cls);
             }
         }
-        Object o = targetHolder.method.invoke(LocalInvocation.getTarget(proxy), args);
+        Object o = MethodInvoke.getMethod(targets).invoke(LocalInvocation.getTarget(proxy), args);
 
-        if (!isCurrent(targetHolder.returnCls)) {
-            o = LocalInvocation.asInvocation(o, targetHolder.returnCls, localMethod.returnCls);
+        Class<?> returnType = MethodInvoke.getReturnType(targets);
+        if (!isCurrent(returnType)) {
+            o = LocalInvocation.asInvocation(o, returnType, null, MethodInvoke.getReturnType(locals));
         }
         return o;
     }

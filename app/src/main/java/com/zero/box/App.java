@@ -20,12 +20,12 @@ public class App extends Application {
         Sdk.initialize(this, new File(base.getCacheDir(), "test"), new AppAssetsLaunchCallback("", "apk"));
 
         box = Sdk.load("", getClassLoader().getParent(), true);
-        box.getInvocation().addInvocationTarget("test2", new Pair<>(new ITestCaller() {
+        box.getInvocation().addInvocationTarget("test2", new ITestCaller() {
             @Override
             public String caller(String test) {
                 return "caller:" + test;
             }
-        }, ITestCaller.class));
+        }, ITestCaller.class);
         box.prepare();
     }
 

@@ -6,18 +6,17 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.res.Resources;
 import android.text.TextUtils;
-import android.util.Pair;
-
 
 import com.zero.support.box.plugin.invoke.IInvocation;
 import com.zero.support.box.plugin.invoke.LocalInvocation;
+import com.zero.support.box.plugin.invoke.MethodInvoke;
+import com.zero.support.box.plugin.invoke.TargetHolder;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("all")
 public class InvocationManager implements IInvocation {
-    private static Map<String, Pair<Object, Class>> invokes = new HashMap<>();
 
     private Box box;
 
@@ -25,30 +24,46 @@ public class InvocationManager implements IInvocation {
         this.box = box;
     }
 
+
+    private final Map<String, TargetHolder> invokes = new HashMap<>();
+    private final Map<Class<?>, Map<String, Object[]>> methods = new HashMap<>();
+
     @Override
-    public void addInvocationTarget(String name, Pair<Object, Class> target) {
+    public void addInvocationTarget(String name, Object target, Class<?> targetCls) {
         synchronized (invokes) {
-            Pair<Object, Class> pair = invokes.put(name, target);
+            TargetHolder pair = invokes.put(name, new TargetHolder(target, targetCls));
             if (pair != null) {
                 LocalInvocation.removeInvocation(pair);
             }
+        }
+    }
+
+    public TargetHolder getInvocationTarget(String name) {
+        synchronized (invokes) {
+            return invokes.get(name);
         }
     }
 
     @Override
     public void removeInvocationTarget(String name) {
         synchronized (invokes) {
-            Pair<Object, Class> pair = invokes.remove(name);
+            TargetHolder pair = invokes.remove(name);
             if (pair != null) {
                 LocalInvocation.removeInvocation(pair);
             }
         }
     }
 
+
     @Override
-    public Pair<Object, Class> getInvocationTarget(String name) {
-        synchronized (invokes) {
-            return invokes.get(name);
+    public Map<String, Object[]> getInvocationMethods(Class<?> cls) {
+        synchronized (methods) {
+            Map<String, Object[]> map = methods.get(cls);
+            if (map == null) {
+                map = MethodInvoke.createMethod(cls,false);
+                methods.put(cls, map);
+            }
+            return map;
         }
     }
 

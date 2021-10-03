@@ -6,7 +6,9 @@ import android.util.Pair;
 
 import com.zero.support.box.plugin.invoke.IInvocation;
 import com.zero.support.box.plugin.invoke.LocalInvocation;
+import com.zero.support.box.plugin.invoke.MethodInvoke;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 
@@ -19,14 +21,22 @@ public class BoxRuntime {
     private static Context context;
     private static Map<String, Object> extras;
     private static IInvocation callerInvocation;
+    private static BoxInvocation invocation;
 
-    public static void init(String name, Context callerContext, ClassLoader caller, PackageInfo packageInfo, Context context, Pair<Object, Class> invocation, Map<String, Object> extra) {
+    public static Object[] init(String name, Context callerContext, ClassLoader caller, PackageInfo packageInfo, Context context, Object target, Class<?> cls, Map<String, Object[]> methods, Map<String, Object> extra) {
         BoxRuntime.boxName = name;
         BoxRuntime.caller = caller;
         BoxRuntime.callerContext = callerContext;
         BoxRuntime.packageInfo = packageInfo;
-        BoxRuntime.callerInvocation = LocalInvocation.asInvocation(invocation, IInvocation.class);
+        BoxRuntime.invocation = new BoxInvocation();
+        BoxRuntime.callerInvocation = LocalInvocation.asInvocation(target, cls, methods, IInvocation.class);
+        LocalInvocation.setTargetInvocation(BoxRuntime.callerInvocation);
         BoxRuntime.extras = extra;
+        Object[] objects = new Object[3];
+        objects[0] = invocation;
+        objects[1] = IInvocation.class;
+        objects[2] = MethodInvoke.createMethod(IInvocation.class,false);
+        return objects;
     }
 
     public static String getBoxName() {
@@ -67,6 +77,10 @@ public class BoxRuntime {
     }
 
     public static <T> T getCallerService(String name, Class<T> cls) {
-        return LocalInvocation.asInvocation(callerInvocation.getInvocationTarget(name),cls);
+        return LocalInvocation.asInvocation(invocation.getInvocationTarget(name), cls);
+    }
+
+    public static BoxInvocation getInvocation() {
+        return invocation;
     }
 }
