@@ -62,11 +62,15 @@ public class Box {
         }
     }
 
+    public IInvocation getBoxInvocation() {
+        return boxInvocation;
+    }
+
     final Object[] init(String boxName, Context callerContext, ClassLoader caller, Context context, ClassLoader loader, PackageInfo info, InvocationManager invocation, Map<String, Object> extras) {
         try {
             Class<?> initializer = Class.forName(boxName + ".BoxInitializer", true, loader);
-            Method init = initializer.getDeclaredMethod("init", String.class, Context.class, ClassLoader.class, PackageInfo.class, Context.class, Object.class,Class.class,Map.class, Map.class);
-            return (Object[]) init.invoke(null, boxName, callerContext, caller, info, context,invocation,IInvocation.class, MethodInvoke.createMethod(IInvocation.class,false), extras);
+            Method init = initializer.getDeclaredMethod("init", String.class, Context.class, ClassLoader.class, PackageInfo.class, Context.class, Object.class, Class.class, Map.class, Map.class);
+            return (Object[]) init.invoke(null, boxName, callerContext, caller, info, context, invocation, IInvocation.class, MethodInvoke.createMethod(IInvocation.class, false), extras);
         } catch (Throwable e) {
             e.printStackTrace();
             Log.e("BoxRuntime", "initializer: failed for " + boxName);
@@ -150,7 +154,7 @@ public class Box {
         return !host;
     }
 
-    public IInvocation getInvocation() {
+    public InvocationManager getInvocation() {
         return invocation;
     }
 }
