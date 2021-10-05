@@ -3,7 +3,6 @@ package com.zero.box.sample;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.util.Log;
-import android.util.Pair;
 
 import com.zero.support.box.plugin.BoxRuntime;
 
@@ -18,7 +17,7 @@ public class BoxInitializer {
                 return "reply: "+test;
             }} ,ITest.class);
 
-        ITestCaller caller1 = BoxRuntime.getCallerService("test2",ITestCaller.class);
+        ITestCaller caller1 = BoxRuntime.getService("test2", ITestCaller.class);
         Log.e("box", "init: "+caller1.caller("xxx") );
         return objects;
     }

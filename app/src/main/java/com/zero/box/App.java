@@ -2,7 +2,6 @@ package com.zero.box;
 
 import android.app.Application;
 import android.content.Context;
-import android.util.Pair;
 
 import com.zero.support.box.Box;
 import com.zero.support.box.Sdk;
@@ -18,8 +17,7 @@ public class App extends Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         Sdk.initialize(this, new File(base.getCacheDir(), "test"), new AppAssetsLaunchCallback("", "apk"));
-
-        box = Sdk.load("", getClassLoader().getParent(), true);
+        box = Sdk.load("", null, getClassLoader().getParent(), true);
         box.getBoxInvocation().addInvocationTarget("test2", new ITestCaller() {
             @Override
             public String caller(String test) {
