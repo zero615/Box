@@ -4,12 +4,10 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.res.AssetManager;
 import android.util.Log;
-import android.util.Pair;
 
 import com.zero.support.box.plugin.invoke.IInvocation;
 import com.zero.support.box.plugin.invoke.LocalInvocation;
 import com.zero.support.box.plugin.invoke.MethodInvoke;
-import com.zero.support.box.plugin.invoke.TargetHolder;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
