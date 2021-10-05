@@ -35,7 +35,7 @@ public class BoxRuntime {
         Object[] objects = new Object[3];
         objects[0] = invocation;
         objects[1] = IInvocation.class;
-        objects[2] = MethodInvoke.createMethod(IInvocation.class,false);
+        objects[2] = MethodInvoke.createMethod(IInvocation.class, false);
         return objects;
     }
 
@@ -76,8 +76,12 @@ public class BoxRuntime {
         return callerInvocation;
     }
 
-    public static <T> T getCallerService(String name, Class<T> cls) {
-        return LocalInvocation.asInvocation(invocation.getInvocationTarget(name), cls);
+    public static <T> T getService(String name, Class<T> cls) {
+        return LocalInvocation.asInvocation(callerInvocation.getInvocationTarget(name), cls);
+    }
+
+    public static void addService(String name, Object object, Class<?> cls) {
+        callerInvocation.addInvocationTarget(name, object, cls);
     }
 
     public static BoxInvocation getInvocation() {

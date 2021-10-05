@@ -20,6 +20,6 @@
         <module name="Box.compiler" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="11" />
+    <bytecodeTargetLevel target="1.8" />
   </component>
 </project>

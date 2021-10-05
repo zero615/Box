@@ -72,27 +72,15 @@ public class Sdk {
         return LauncherManager.getDefault().install(root, name);
     }
 
-    public static Box load(String name, ClassLoader parent, boolean host) {
-        install(name);
-        Launcher launcher = LauncherManager.getDefault().getLauncher(name);
+    public static Box load(String pkg,Launcher launcher, ClassLoader parent, boolean host) {
         if (!host){
             String next = launcher.getCurrentPath();
             File target = new File(next, "base.apk");
             File libRoot = new File(next, "lib");
             File lib = new File(libRoot, Sdk.getAbiName(libRoot));
-            return BoxManager.load(app, parent, target, lib, host);
+            return BoxManager.load(pkg,app, parent, target, lib, host);
         }
-        return BoxManager.load(app, parent, null, null, host);
-    }
-
-    public static Box load(File root, String name, ClassLoader parent, boolean host) {
-        install(root, name);
-        Launcher launcher = LauncherManager.getDefault().getLauncher(root, name);
-        String next = launcher.getCurrentPath();
-        File target = new File(next, "base.apk");
-        File libRoot = new File(next, "lib");
-        File lib = new File(libRoot, Sdk.getAbiName(libRoot));
-        return BoxManager.load(app, parent, target, lib, host);
+        return BoxManager.load(pkg,app, parent, null, null, host);
     }
 
     public static void becomToParent(ClassLoader target, ClassLoader loader) {

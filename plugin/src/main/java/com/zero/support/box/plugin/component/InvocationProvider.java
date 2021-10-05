@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class InvocationProvider implements IInvocationProvider {
     private ContentProvider provider;
 
-    public final ContentProvider requireContentProvider() {
+    public final ContentProvider requireProvider() {
         return provider;
     }
 

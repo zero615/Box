@@ -12,9 +12,9 @@ public interface IInvocation {
 
     @BoxName("removeInvocationTarget")
     void removeInvocationTarget(String name);
-//
-//    @BoxName("getInvocationTarget")
-//    Pair<Object, Class> getInvocationTarget(String name);
+
+    @BoxName("getInvocationTarget")
+    Object[] getInvocationTarget(String name);
 
     @BoxName("getInvocationMethods")
     Map<String, Object[]> getInvocationMethods(Class<?> cls);

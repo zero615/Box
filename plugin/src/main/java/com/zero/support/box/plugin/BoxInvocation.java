@@ -13,53 +13,38 @@ import java.util.Map;
 
 public class BoxInvocation implements IInvocation {
 
-    private final Map<String, TargetHolder> invokes = new HashMap<>();
-    private final Map<Class<?>,Map<String,Object[]>> methods = new HashMap<>();
+    private final Map<Class<?>, Map<String, Object[]>> methods = new HashMap<>();
 
-    public static final BoxInvocation INSTANCE = new BoxInvocation();
     @Override
     public void addInvocationTarget(String name, Object target, Class<?> targetCls) {
-        synchronized (invokes) {
-            TargetHolder pair = invokes.put(name, new TargetHolder(target, targetCls));
-            if (pair != null) {
-                LocalInvocation.removeInvocation(pair);
-            }
-        }
+        BoxRuntime.getCallerInvocation().addInvocationTarget(name, target, targetCls);
     }
 
-    public TargetHolder getInvocationTarget(String name) {
-        synchronized (invokes) {
-            return invokes.get(name);
-        }
+    public Object[] getInvocationTarget(String name) {
+        return BoxRuntime.getCallerInvocation().getInvocationTarget(name);
     }
 
     @Override
     public void removeInvocationTarget(String name) {
-        synchronized (invokes) {
-            TargetHolder pair = invokes.remove(name);
-            if (pair != null) {
-                LocalInvocation.removeInvocation(pair);
-            }
-        }
+        BoxRuntime.getCallerInvocation().removeInvocationTarget(name);
     }
 
 
     @Override
     public Map<String, Object[]> getInvocationMethods(Class<?> cls) {
-        synchronized (methods){
-           Map<String,Object[]> map =  methods.get(cls);
-           if (map==null){
-               map = MethodInvoke.createMethod(cls,false);
-               methods.put(cls,map);
-           }
-           return map;
+        synchronized (methods) {
+            Map<String, Object[]> map = methods.get(cls);
+            if (map == null) {
+                map = MethodInvoke.createMethod(cls, false);
+                methods.put(cls, map);
+            }
+            return map;
         }
     }
 
 
     @Override
     public Context createBoxContext(Context base, int theme) {
-
         return BoxRuntime.getCallerInvocation().createBoxContext(base, theme);
     }
 

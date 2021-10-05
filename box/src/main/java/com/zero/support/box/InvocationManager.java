@@ -10,7 +10,7 @@ import android.text.TextUtils;
 import com.zero.support.box.plugin.invoke.IInvocation;
 import com.zero.support.box.plugin.invoke.LocalInvocation;
 import com.zero.support.box.plugin.invoke.MethodInvoke;
-import com.zero.support.box.plugin.invoke.TargetHolder;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,20 +25,24 @@ public class InvocationManager implements IInvocation {
     }
 
 
-    private final Map<String, TargetHolder> invokes = new HashMap<>();
+    private final Map<String, Object[]> invokes = new HashMap<>();
     private final Map<Class<?>, Map<String, Object[]>> methods = new HashMap<>();
 
     @Override
     public void addInvocationTarget(String name, Object target, Class<?> targetCls) {
         synchronized (invokes) {
-            TargetHolder pair = invokes.put(name, new TargetHolder(target, targetCls));
+            Object[] objects = new Object[2];
+            objects[0] = target;
+            objects[1] = targetCls;
+            Object[] pair = invokes.put(name,objects);
             if (pair != null) {
-                LocalInvocation.removeInvocation(pair);
+                LocalInvocation.removeInvocation(pair[0]);
             }
         }
     }
 
-    public TargetHolder getInvocationTarget(String name) {
+    @Override
+    public Object[] getInvocationTarget(String name) {
         synchronized (invokes) {
             return invokes.get(name);
         }
@@ -47,9 +51,9 @@ public class InvocationManager implements IInvocation {
     @Override
     public void removeInvocationTarget(String name) {
         synchronized (invokes) {
-            TargetHolder pair = invokes.remove(name);
+            Object[] pair = invokes.remove(name);
             if (pair != null) {
-                LocalInvocation.removeInvocation(pair);
+                LocalInvocation.removeInvocation(pair[0]);
             }
         }
     }

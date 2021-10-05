@@ -45,11 +45,11 @@ public class BoxManager {
         }
     }
 
-    public static Box load(Context context, File path, File lib) {
-        return load(context, context.getClassLoader(), path, lib, false);
+    public static Box load(Context context, ClassLoader parent, File path, File lib, boolean host) {
+        return load(null,context, context.getClassLoader(), path, lib, false);
     }
 
-    public static Box load(Context context, ClassLoader parent, File apk, File lib, boolean host) {
+    public static Box load(String name,Context context, ClassLoader parent, File apk, File lib, boolean host) {
         try {
             PackageInfo packageInfo;
             ClassLoader classLoader;
@@ -64,7 +64,10 @@ public class BoxManager {
                 packageInfo.applicationInfo.nativeLibraryDir = lib.getCanonicalPath();
                 classLoader = new DexClassLoader(path, apk.getParentFile().getCanonicalPath(), lib.getCanonicalPath(), parent);
             }
-            Box box = new Box(packageInfo.packageName, context, packageInfo, classLoader, host);
+            if (name==null){
+                name = packageInfo.packageName;
+            }
+            Box box = new Box(name, context, packageInfo, classLoader, host);
             synchronized (boxes) {
                 boxes.put(packageInfo.packageName, box);
             }

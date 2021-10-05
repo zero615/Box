@@ -16,7 +16,7 @@ public class InvocationService implements IInvocationService {
     @Override
     public Context attach(Service service, Context newBase) {
         this.service = service;
-        return service;
+        return newBase;
     }
 
     public final Service requireService() {

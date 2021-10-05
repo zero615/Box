@@ -15,8 +15,8 @@ public class LocalInvocation {
         LocalInvocation.targetInvocation = invocation;
     }
 
-    public static <T> T asInvocation(TargetHolder holder, Class<?> cls) {
-        return asInvocation(holder.object, holder.cls, null, cls);
+    public static <T> T asInvocation(Object[] targets, Class<?> cls) {
+        return asInvocation(targets[0], (Class<?>) targets[1], null, cls);
     }
 
     public static <T> T asInvocation(Object target, Class<?> targetCls, Map<String, Object[]> targetMethod, Class<?> cls) {

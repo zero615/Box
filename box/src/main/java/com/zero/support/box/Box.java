@@ -78,10 +78,15 @@ public class Box {
         return null;
     }
 
-    public <T> T getBoxService(String name, Class<T> cls) {
-        TargetHolder pair = invocation.getInvocationTarget(name);
-        return LocalInvocation.asInvocation(pair, cls);
+
+    public <T> T getService(String name, Class<T> cls) {
+        return LocalInvocation.asInvocation(invocation.getInvocationTarget(name), cls);
     }
+
+    public void addService(String name, Object object, Class<?> cls) {
+        invocation.addInvocationTarget(name, object, cls);
+    }
+
 
     public String getBoxName() {
         return boxName;
